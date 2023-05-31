@@ -8,7 +8,7 @@
 // {
 //     // Load point cloud data from file
 //     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-//     pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/0.pcd", *cloud);
+//     pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/0.pcd", *cloud);
 
 //     // Estimate surface normals
 //     pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
@@ -64,7 +64,7 @@
 // {
 //     // Load point cloud data from file
 //     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-//     pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/0.pcd", *cloud);
+//     pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/0.pcd", *cloud);
 
 //     // Get the total number of points in the point cloud
 //     std::size_t numPoints = cloud->points.size();
@@ -88,7 +88,7 @@
 // {
 //     // Load point cloud data from file
 //     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-//     pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/0.pcd", *cloud);
+//     pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/0.pcd", *cloud);
 
 //     // Estimate surface normals
 //     pcl::NormalEstimation<pcl::PointXYZ, pcl::Normal> ne;
@@ -139,7 +139,7 @@
 // int main() {
 //   // Load point cloud data from file
 //   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-//   if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/test.pcd", *cloud) == -1) {
+//   if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/test.pcd", *cloud) == -1) {
 //     PCL_ERROR("Couldn't read the input point cloud file.\n");
 //     return -1;
 //   }
@@ -207,7 +207,7 @@
 // {
 //     // Load the point cloud data
 //     PointCloudT::Ptr cloud(new PointCloudT);
-//     pcl::io::loadPCDFile<PointT>("/home/joe/pointCloud/0.pcd", *cloud);
+//     pcl::io::loadPCDFile<PointT>("/home/joe/pcl_filteration/0.pcd", *cloud);
 
 //     // Prepare the data for curve fitting
 //     Eigen::MatrixXd A(cloud->size(), 2);

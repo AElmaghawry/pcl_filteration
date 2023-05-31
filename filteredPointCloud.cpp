@@ -11,7 +11,7 @@ int main()
 {
   // Load the point cloud data
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-  pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/0.pcd", *cloud);
+  pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/0.pcd", *cloud);
 
   // Compute the center point of the point cloud
   pcl::PointXYZ center;

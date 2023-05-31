@@ -18,7 +18,7 @@ void calculateRollPitchYaw(float nx, float ny, float nz, float& roll, float& pit
 int main() {
   // Load point cloud data from file
   pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-  if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/test.pcd", *cloud) == -1) {
+  if (pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/test.pcd", *cloud) == -1) {
     PCL_ERROR("Couldn't read the input point cloud file.\n");
     return -1;
   }

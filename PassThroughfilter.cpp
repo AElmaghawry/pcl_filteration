@@ -6,7 +6,7 @@ int main()
 {
     // Load the input point cloud
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pointCloud/0.pcd", *cloud);
+    pcl::io::loadPCDFile<pcl::PointXYZ>("/home/joe/pcl_filteration/0.pcd", *cloud);
 
     // Apply the pass-through filter along the Z-axis
     pcl::PassThrough<pcl::PointXYZ> pass;

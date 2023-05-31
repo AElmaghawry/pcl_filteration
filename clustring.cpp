@@ -15,18 +15,18 @@ int main(int argc, char **argv)
 {
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    std::string file_name = "/home/joe/pointCloud/0.pcd";
+    std::string file_name = "/home/joe/pcl_filteration/0.pcd";
 
     if (pcl::io::loadPCDFile<pcl::PointXYZ>(file_name, *cloud) == -1) //* load the file
     {
         PCL_ERROR("Couldn't read file test_pcd.pcd \n");
         return (-1);
     }
-    std::cout << "Loaded "
-              << cloud->width * cloud->height
-              << " :"
-              << file_name
-              << std::endl;
+    std::cout   << "Loaded "
+                << cloud->width * cloud->height
+                << " :"
+                << file_name
+                << std::endl;
 
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
     pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
