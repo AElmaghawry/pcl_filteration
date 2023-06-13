@@ -16,4 +16,9 @@
 #include <pcl/features/don.h>
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/search/organized.h>
-
+#include <math.h>
+#include <pcl/ModelCoefficients.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/common/centroid.h>
