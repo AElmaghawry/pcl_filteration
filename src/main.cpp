@@ -1,4 +1,9 @@
 #include <bladAngleDetection.hpp>
+#include <list>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
+#include <cstring>
 
 class PointCloudProcessing
 {
@@ -48,7 +53,7 @@ public:
         viewer.addPointCloud(colored_cloud, "cluster viewer");
         viewer.setBackgroundColor(0.0, 0.0, 0.0);
         viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(colored_cloud, normals);
-        viewer.spin();
+        viewer.spinOnce();
     }
 };
 
@@ -98,7 +103,6 @@ public:
                       << " has "
                       << clusters[i].indices.size()
                       << " points." << std::endl;
-
         }
         colored_cloud = reg.getColoredCloud();
     }
@@ -137,6 +141,46 @@ int main(int argc, char **argv)
     pcProcessing.saveClusterPointClouds(clusters, colored_cloud, 1500);
 
     pcProcessing.visualizePointCloud(colored_cloud, regionSegmentation.getNormals());
+
+    std::cout << clusters.size() << std::endl;
+
+    std::string cloud_of_intreset_dir = "../data/cloud_cluster_"; ///home/jeo/ku/pcl_filteration/data/cloud_cluster_0.pcd
+
+    std::vector<std::string> files_paths{};
+    PointCloudProcessing pcSelection;
+    
+    for (int i{0}; i < clusters.size(); i++)
+    {
+        files_paths.push_back(cloud_of_intreset_dir + std::to_string(i) + ".pcd");
+    }
+    // std::cout << files_paths[1] << std::endl;
+
+    std::list<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> pointClouds; 
+    int i {0} ; 
+    for (const std::string &filepath : files_paths)
+    {   
+        pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
+        pcl::io::loadPCDFile<pcl::PointXYZRGB>(filepath, *cloud);
+        pointClouds.push_back(cloud);
+        i++ ;
+        std::cout<< "Loading the pcd files ......" << i << std::endl ; 
+
+    }
+
+    size_t smallestSize = std::numeric_limits<size_t>::max();
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr smallestCloud;
+
+    for (const auto& cloud : pointClouds)
+    {
+        size_t cloudSize = cloud->size();
+        if (cloudSize < smallestSize)
+        {
+            smallestSize = cloudSize;
+            smallestCloud = cloud;
+        }
+    }
+
+    std::cout << "The smalles pcl size is equal " << smallestCloud->width * smallestCloud->height <<std::endl;
 
     return 0;
 }
