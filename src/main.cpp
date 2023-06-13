@@ -23,7 +23,7 @@ public:
         return true;
     }
 
-    void saveClusterPointClouds(const std::vector<pcl::PointIndices> &clusters, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &colored_cloud, int minClusterSize)
+    void saveClusterPointClouds(const std::vector<pcl::PointIndices> &clusters, const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &colored_cloud, int minClusterSize, std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> &clusters_vector)
     {
         pcl::PCDWriter writer;
         int j = 0;
@@ -39,10 +39,13 @@ public:
                 cloud_cluster->width = indices.indices.size();
                 cloud_cluster->height = 1;
                 cloud_cluster->is_dense = true;
-                std::stringstream ss;
-                ss << "../data/cloud_cluster_" << j << ".pcd";
-                writer.write<pcl::PointXYZRGB>(ss.str(), *cloud_cluster, false);
-                j++;
+                
+                clusters_vector.push_back(cloud_cluster);
+
+                // std::stringstream ss;
+                // ss << "../data/cloud_cluster_" << j << ".pcd";
+                // writer.write<pcl::PointXYZRGB>(ss.str(), *cloud_cluster, false);
+                // j++;
             }
         }
     }
@@ -137,8 +140,8 @@ int main(int argc, char **argv)
 
     const std::vector<pcl::PointIndices> &clusters = regionSegmentation.getClusters();
     const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &colored_cloud = regionSegmentation.getColoredCloud();
-
-    pcProcessing.saveClusterPointClouds(clusters, colored_cloud, 1500);
+    std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clusters_vector;
+    pcProcessing.saveClusterPointClouds(clusters, colored_cloud, 1500, clusters_vector);
 
     pcProcessing.visualizePointCloud(colored_cloud, regionSegmentation.getNormals());
 
@@ -170,7 +173,7 @@ int main(int argc, char **argv)
     size_t smallestSize = std::numeric_limits<size_t>::max();
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr smallestCloud;
 
-    for (const auto& cloud : pointClouds)
+    for (const auto& cloud : clusters_vector)
     {
         size_t cloudSize = cloud->size();
         if (cloudSize < smallestSize)
