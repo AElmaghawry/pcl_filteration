@@ -34,7 +34,7 @@ double calcAngelTwoVectors(pcl::ModelCoefficients::Ptr coefficients1 ,pcl::Model
 }
 int main (int argc, char **argv){
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
-    pcl::io::loadPCDFile<pcl::PointXYZRGB>("/home/joe/pointCloud/cloud_cluster_1.pcd", *cloud);
+    pcl::io::loadPCDFile<pcl::PointXYZRGB>("../data/cloud_cluster_1.pcd", *cloud);
 
     pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
     pcl::PointIndices::Ptr inliers (new pcl::PointIndices);

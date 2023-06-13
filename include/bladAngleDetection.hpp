@@ -1,0 +1,19 @@
+#include <pcl/search/impl/search.hpp>
+#include <cstring>
+#include <iostream>
+#include <vector>
+#include <pcl/point_types.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/search/search.h>
+#include <pcl/search/kdtree.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/features/normal_3d_omp.h>
+#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/segmentation/region_growing.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/segmentation/extract_clusters.h>
+#include <pcl/features/don.h>
+#include <pcl/filters/conditional_removal.h>
+#include <pcl/search/organized.h>
+

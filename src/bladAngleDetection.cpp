@@ -1,32 +1,21 @@
-#include <cstring>
-#include <iostream>
-#include <vector>
-#include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/search/search.h>
-#include <pcl/search/kdtree.h>
-#include <pcl/features/normal_3d.h>
-#include <pcl/visualization/cloud_viewer.h>
-#include <pcl/filters/passthrough.h>
-#include <pcl/segmentation/region_growing.h>
-#include <pcl/visualization/pcl_visualizer.h>
+#include<bladAngleDetection.hpp>
 
 int main(int argc, char **argv)
 {
 
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    std::string file_name = "/home/joe/pointCloud/0.pcd";
+    std::string file_name = "/home/joe/pcl_filteration/data/0.pcd";
 
     if (pcl::io::loadPCDFile<pcl::PointXYZ>(file_name, *cloud) == -1) //* load the file
     {
         PCL_ERROR("Couldn't read file test_pcd.pcd \n");
         return (-1);
     }
-    std::cout << "Loaded "
-              << cloud->width * cloud->height
-              << " :"
-              << file_name
-              << std::endl;
+    std::cout   << "Loaded "
+                << cloud->width * cloud->height
+                << " :"
+                << file_name
+                << std::endl;
 
     pcl::search::Search<pcl::PointXYZ>::Ptr tree(new pcl::search::KdTree<pcl::PointXYZ>);
     pcl::PointCloud<pcl::Normal>::Ptr normals(new pcl::PointCloud<pcl::Normal>);
@@ -63,10 +52,10 @@ int main(int argc, char **argv)
         if (clusters[i].indices.size() > 1500)
         {
             blade_cluster.push_back(clusters[i]);
-            std::cout << "Cluster " << i + 1
-                      << " has "
-                      << clusters[i].indices.size()
-                      << " points." << std::endl;
+            std::cout   << "Cluster " << i + 1
+                        << " has "
+                        << clusters[i].indices.size()
+                        << " points." << std::endl;
         }
     }
     std::cout << "-------------------------"<<endl ; 
