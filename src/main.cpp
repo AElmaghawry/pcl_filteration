@@ -1,34 +1,4 @@
 #include <bladAngleDetection.hpp>
-#include <list>
-#include <pcl/io/pcd_io.h>
-#include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
-#include <cstring>
-
-
-double calcAngelTwoVectors(pcl::ModelCoefficients::Ptr coefficients1 ,pcl::ModelCoefficients::Ptr coefficients2)
-{
-    double dot {} ; 
-    double lenSq1 {} ; 
-    double lenSq2 {}; 
-    double angle {}; 
-
-    double x1,x2,y1,y2,z1,z2{}; 
-
-    x1= coefficients1->values[0]; 
-    y1= coefficients1->values[1];
-    z1= coefficients1->values[2];
-    x2= coefficients2->values[0];
-    y2= coefficients2->values[1];
-    z2= coefficients2->values[2];
-
-    dot = x1*x2 + y1*y2 + z1*z2 ; 
-    lenSq1 = x1*x1 + y1*y1 + z1*z1;
-    lenSq2 = x2*x2 + y2*y2 + z2*z2;
-    angle = acos(dot/sqrt(lenSq1 * lenSq2));
-    angle = angle * 180 / 3.14 ; 
-    return angle ; 
-}
 
 class PointCloudProcessing
 {
@@ -67,10 +37,10 @@ public:
                 
                 clusters_vector.push_back(cloud_cluster);
 
-                // std::stringstream ss;
-                // ss << "../data/cloud_cluster_" << j << ".pcd";
-                // writer.write<pcl::PointXYZRGB>(ss.str(), *cloud_cluster, false);
-                // j++;
+                std::stringstream ss;
+                ss << "../data/cloud_cluster_" << j << ".pcd";
+                writer.write<pcl::PointXYZRGB>(ss.str(), *cloud_cluster, false);
+                j++;
             }
         }
     }
@@ -153,8 +123,8 @@ public:
 
 int main(int argc, char **argv)
 {
-    std::string file_name = "../data/0.pcd";
-
+    std::string file_name = "../data/data_set/4/4.pcd";
+    
     PointCloudProcessing pcProcessing;
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
     if (!pcProcessing.loadPointCloud(file_name, cloud))
@@ -181,7 +151,7 @@ int main(int argc, char **argv)
     {
         files_paths.push_back(cloud_of_intreset_dir + std::to_string(i) + ".pcd");
     }
-    // std::cout << files_paths[1] << std::endl;
+    std::cout << files_paths[1] << std::endl;
 
     std::list<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> pointClouds; 
     int i {0} ; 
@@ -226,7 +196,7 @@ int main(int argc, char **argv)
     seg.setOptimizeCoefficients (true);
     seg.setModelType (pcl::SACMODEL_PLANE);
     seg.setMethodType (pcl::SAC_RANSAC);
-    seg.setDistanceThreshold (0.01);
+    seg.setDistanceThreshold (0.0001);
 
     seg.setInputCloud (smallestCloud);
     seg.segment (*inliers, *coefficients);
@@ -254,7 +224,7 @@ int main(int argc, char **argv)
     
     viewer.setBackgroundColor(0.0, 0.0, 0.0);
     viewer.addPointCloud<pcl::PointXYZRGB>(smallestCloud, "cloud");
-    viewer.addPointCloud(cloud, "point_cloud");
+    viewer.addPointCloud(smallestCloud, "point_cloud");
     
     viewer.addPlane(*coefficients,"plane");
     viewer.addPlane(*coefficientsRef,"refrence"); 
