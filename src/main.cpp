@@ -1,5 +1,47 @@
 #include <bladAngleDetection.hpp>
 
+class CSVWriter
+{
+private:
+    std::string filename;
+    std::ofstream file;
+
+public:
+    CSVWriter(const std::string &filename) : filename(filename)
+    {
+        file.open(filename);
+        if (!file.is_open())
+        {
+            std::cout << "Failed to open file: " << filename << std::endl;
+        }
+    }
+
+    ~CSVWriter()
+    {
+        if (file.is_open())
+        {
+            file.close();
+        }
+    }
+
+    void writeRow(const std::vector<std::string> &row)
+    {
+        if (!file.is_open())
+        {
+            std::cout << "File is not open." << std::endl;
+            return;
+        }
+
+        for (size_t i = 0; i < row.size(); ++i)
+        {
+            file << row[i];
+            if (i != row.size() - 1)
+                file << ",";
+        }
+        file << "\n";
+    }
+};
+
 class PointCloudProcessing
 {
 public:
@@ -123,13 +165,17 @@ public:
 
 int main(int argc, char **argv)
 {
+    std::string filename = "../data/measuredAngles.csv";
+    CSVWriter writer(filename);
+    writer.writeRow({"Blade No.", "Measured Angles"});
+
     std::string direcoty_name = "../data/data_set/";
     // std::string file_name = "../data/data_set/4/4.pcd";
     std::cout << "Enter the number of the data set " << std::endl;
     int userSelection{0};
     std::cin >> userSelection;
 
-    for (int counter{1}; counter <= userSelection; counter++)
+    for (int counter{1}; counter <= userSelection; ++counter)
     {
         std::string file_name = direcoty_name + std::to_string(counter) + "/" + std::to_string(counter) + ".pcd";
 
@@ -243,6 +289,9 @@ int main(int argc, char **argv)
                   << calcAngelTwoVectors(coefficientsRef, coefficients)
                   << " degrees"
                   << std::endl;
+        
+        // writer.writeRow({"S/N", "Blade No.", "Measured Angles"});
+        writer.writeRow({std::to_string(counter), std::to_string(calcAngelTwoVectors(coefficientsRef, coefficients))});
 
         // viewer.addCoordinateSystem(0.1);
         // viewer.spin();

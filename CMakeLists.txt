@@ -29,6 +29,8 @@ add_executable(don src/don.cpp)
 add_executable(readPointCloud src/readPointCloud.cpp)
 add_executable(planeFitting src/planeFitting.cpp)
 add_executable(main src/main.cpp)
+add_executable(writeCsv src/writeCsv.cpp)
+
 # add_executable(bladAngleDetection src/bladAngleDetection.cpp)
 
 # Link against the PCL libraries
@@ -43,6 +45,7 @@ target_link_libraries(don ${PCL_LIBRARIES})
 target_link_libraries(readPointCloud ${PCL_LIBRARIES})
 target_link_libraries(planeFitting ${PCL_LIBRARIES})
 target_link_libraries(main ${PCL_LIBRARIES})
+target_link_libraries(writeCsv ${PCL_LIBRARIES})
 
 # target_link_libraries(bladAngleDetection ${PCL_LIBRARIES})
 
