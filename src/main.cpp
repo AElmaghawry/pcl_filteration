@@ -52,10 +52,11 @@ public:
             PCL_ERROR("Couldn't read the file \n");
             return false;
         }
-        std::cout << "Loaded "
-                  << cloud->width * cloud->height
-                  << " :"
-                  << file_name
+        std::cout << "\033[37m"
+                  << "Loaded "
+                  << "\033[93m" << cloud->width * cloud->height
+                  //   << " :"
+                  //   << file_name
                   << std::endl;
         return true;
     }
@@ -89,11 +90,11 @@ public:
 
     void visualizePointCloud(const pcl::PointCloud<pcl::PointXYZRGB>::Ptr &colored_cloud, const pcl::PointCloud<pcl::Normal>::Ptr &normals)
     {
-        pcl::visualization::PCLVisualizer viewer("Cluster viewer");
-        viewer.addPointCloud(colored_cloud, "cluster viewer");
-        viewer.setBackgroundColor(0.0, 0.0, 0.0);
-        viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(colored_cloud, normals);
-        viewer.spinOnce();
+        // pcl::visualization::PCLVisualizer viewer("Cluster viewer");
+        // viewer.addPointCloud(colored_cloud, "cluster viewer");
+        // viewer.setBackgroundColor(0.0, 0.0, 0.0);
+        // viewer.addPointCloudNormals<pcl::PointXYZRGB, pcl::Normal>(colored_cloud, normals);
+        // viewer.spinOnce();
     }
 };
 
@@ -139,9 +140,11 @@ public:
         {
 
             blade_cluster.push_back(clusters[i]);
-            std::cout << "Cluster " << i + 1
+            std::cout << "\033[37m"
+                      << "Cluster " << i + 1
                       << " has "
-                      << clusters[i].indices.size()
+                      << "\033[94m" << clusters[i].indices.size()
+                      << "\033[37m"
                       << " points." << std::endl;
         }
         colored_cloud = reg.getColoredCloud();
@@ -171,14 +174,17 @@ int main(int argc, char **argv)
 
     std::string direcoty_name = "../data/data_set/";
     // std::string file_name = "../data/data_set/4/4.pcd";
-    std::cout << "Enter the number of the data set " << std::endl;
+
+    std::cout << "\033[93m"
+              << "Enter the number of the data set : ";
     int userSelection{0};
     std::cin >> userSelection;
 
     for (int counter{1}; counter <= userSelection; ++counter)
     {
         std::string file_name = direcoty_name + std::to_string(counter) + "/" + std::to_string(counter) + ".pcd";
-
+        std::cout << "\033[37m"
+                  << "The Data set Directory : " << file_name << std::endl;
         PointCloudProcessing pcProcessing;
         pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
         if (!pcProcessing.loadPointCloud(file_name, cloud))
@@ -194,7 +200,7 @@ int main(int argc, char **argv)
 
         pcProcessing.visualizePointCloud(colored_cloud, regionSegmentation.getNormals());
 
-        std::cout << clusters.size() << std::endl;
+        // std::cout << clusters.size() << std::endl;
 
         std::string cloud_of_intreset_dir = "../data/cloud_cluster_"; /// home/jeo/ku/pcl_filteration/data/cloud_cluster_0.pcd
 
@@ -205,7 +211,7 @@ int main(int argc, char **argv)
         {
             files_paths.push_back(cloud_of_intreset_dir + std::to_string(i) + ".pcd");
         }
-        std::cout << files_paths[1] << std::endl;
+        // std::cout << files_paths[1] << std::endl;
 
         std::list<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> pointClouds;
         int i{0};
@@ -215,7 +221,7 @@ int main(int argc, char **argv)
             pcl::io::loadPCDFile<pcl::PointXYZRGB>(filepath, *cloud);
             pointClouds.push_back(cloud);
             i++;
-            std::cout << "Loading the pcd files ......" << i << std::endl;
+            // std::cout << "Loading the pcd files ......" << i << std::endl;
         }
 
         size_t smallestSize = std::numeric_limits<size_t>::max();
@@ -231,7 +237,9 @@ int main(int argc, char **argv)
             }
         }
 
-        std::cout << "The smalles pcl size is equal " << smallestCloud->width * smallestCloud->height << std::endl;
+        std::cout << "\033[37m"
+                  << "The smalles pcl size is equal = "
+                  << "\033[93m" << smallestCloud->width * smallestCloud->height << std::endl;
 
         pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
         pcl::PointIndices::Ptr inliers(new pcl::PointIndices);
@@ -245,6 +253,7 @@ int main(int argc, char **argv)
             point.y -= centroid.y;
             point.z -= centroid.z;
         }
+    
         pcl::SACSegmentation<pcl::PointXYZRGB> seg;
         seg.setOptimizeCoefficients(true);
         seg.setModelType(pcl::SACMODEL_PLANE);
@@ -260,7 +269,10 @@ int main(int argc, char **argv)
             return (-1);
         }
 
-        std::cerr << "Model coefficients: " << coefficients->values[0] << " "
+        std::cerr << "\033[37m"
+                  << "Model coefficients: "
+                  << "\033[96m"
+                  << coefficients->values[0] << " "
                   << coefficients->values[1] << " "
                   << coefficients->values[2] << " "
                   << coefficients->values[3] << std::endl;
@@ -283,13 +295,15 @@ int main(int argc, char **argv)
         // viewer.setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 1.0, 1.0, 0.0, "plane");
         // viewer.setShapeRenderingProperties(pcl::visualization::PCL_VISUALIZER_COLOR, 0.0, 1.0, 1.0, "refrence");
 
-        std::cout << "________________________________________" << std::endl;
+        std::cout << "\033[32m"
+                  << "________________________________________" << std::endl;
 
-        std::cout << "Measured Angle between refrence frame and Surface is = "
-                  << calcAngelTwoVectors(coefficientsRef, coefficients)
+        std::cout << "Measured Angle between refrence frame and Surface of the clustred blade is = "
+                  << "\033[96m" << calcAngelTwoVectors(coefficientsRef, coefficients)
+                  << "\033[32m"
                   << " degrees"
                   << std::endl;
-        
+
         // writer.writeRow({"S/N", "Blade No.", "Measured Angles"});
         writer.writeRow({std::to_string(counter), std::to_string(calcAngelTwoVectors(coefficientsRef, coefficients))});
 
