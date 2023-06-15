@@ -2,6 +2,7 @@
 #include <math.h>
 #include <vector>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
@@ -24,6 +25,8 @@
 #include <pcl/segmentation/extract_clusters.h>
 #include <pcl/sample_consensus/method_types.h>
 #include <pcl/segmentation/sac_segmentation.h>
+
+
 double calcAngelTwoVectors(pcl::ModelCoefficients::Ptr coefficients1 ,pcl::ModelCoefficients::Ptr coefficients2);
 
 
