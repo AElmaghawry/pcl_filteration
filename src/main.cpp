@@ -168,6 +168,9 @@ public:
 
 int main(int argc, char **argv)
 {
+    std::vector<double> bladeCoeff{};
+    std::vector<double> centriodBlades{};
+
     std::string filename = "../data/measuredAngles.csv";
     CSVWriter writer(filename);
     writer.writeRow({"Blade No.", "Measured Angles"});
@@ -253,7 +256,15 @@ int main(int argc, char **argv)
             point.y -= centroid.y;
             point.z -= centroid.z;
         }
-    
+        std::cout << "The Centriod of blade No." << counter << ": x = "
+                  << centroid.x << ", y = "
+                  << centroid.y << ", z ="
+                  << centroid.z << std::endl;
+
+        centriodBlades.push_back(centroid.x);
+        centriodBlades.push_back(centroid.y);
+        centriodBlades.push_back(centroid.z);
+
         pcl::SACSegmentation<pcl::PointXYZRGB> seg;
         seg.setOptimizeCoefficients(true);
         seg.setModelType(pcl::SACMODEL_PLANE);
@@ -276,6 +287,11 @@ int main(int argc, char **argv)
                   << coefficients->values[1] << " "
                   << coefficients->values[2] << " "
                   << coefficients->values[3] << std::endl;
+
+        bladeCoeff.push_back(coefficients->values[0]);
+        bladeCoeff.push_back(coefficients->values[1]);
+        bladeCoeff.push_back(coefficients->values[2]);
+        bladeCoeff.push_back(coefficients->values[3]);
 
         pcl::ModelCoefficients::Ptr coefficientsRef(new pcl::ModelCoefficients);
         coefficientsRef->values.push_back(0.0);
@@ -304,12 +320,56 @@ int main(int argc, char **argv)
                   << " degrees"
                   << std::endl;
 
-        // writer.writeRow({"S/N", "Blade No.", "Measured Angles"});
+        /*
+            .csv filling template
+            {"Blade No.", "Measured Angles"}
+        */
+
         writer.writeRow({std::to_string(counter), std::to_string(calcAngelTwoVectors(coefficientsRef, coefficients))});
 
         // viewer.addCoordinateSystem(0.1);
         // viewer.spin();
     }
+    // std::cout << "\033[33m"
+    //           << "-------------------------------------------------------------------" << std::endl;
+    // std::cout << "The size of the of the centriod blade is equal = " << centriodBlades.size() << std::endl;
+    // std::cout << "The Coff. for the recorded blades are equal = " << bladeCoeff.size() << std::endl;
+
+    // Eigen::Vector3d v(0.00743252, -0.781734, 0.860328);
+    Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
+    normalizedVector = normalizedVector.normalized();
+
+    std::vector<double> delta{};
+
+    for (int itr{3}; itr < (centriodBlades.size()); itr += 3)
+    {
+        delta.push_back(centriodBlades[itr] - centriodBlades[0]);
+        delta.push_back(centriodBlades[itr + 1] - centriodBlades[1]);
+        delta.push_back(centriodBlades[itr + 2] - centriodBlades[2]);
+    }
+
+    int pointCounter{0};
+    std::string offsetMeasurmentsFile = "../data/offsetCalc.csv";
+    CSVWriter writerOffsetCalc(offsetMeasurmentsFile);
+
+    writerOffsetCalc.writeRow({"Offset Calculation"});
+    for (int itr{0}; itr < (delta.size()); itr += 3)
+    {
+        Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
+        /*
+        un comment the next line of code for to print the measured offest values on the termianl 
+        */
+        // std::cout << "Dot product of between refrence blade and blade No.: "
+        //           << pointCounter << " is equal = "
+        //           << deltaVector.dot(normalizedVector) << std::endl;
+        pointCounter++;
+        writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
+    }
+    // std::cout << "The Normalized vector " << normalizedVector << endl ;
+
+    // std::cout << bladeCoeff[0]<<bladeCoeff[1]<<bladeCoeff[2] << std::endl ;
+
+    //  v.dot(w)
 
     return 0;
 }

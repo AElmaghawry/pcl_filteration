@@ -30,6 +30,7 @@ add_executable(readPointCloud src/readPointCloud.cpp)
 add_executable(planeFitting src/planeFitting.cpp)
 add_executable(main src/main.cpp)
 add_executable(writeCsv src/writeCsv.cpp)
+add_executable(scratchScript src/scratchScript.cpp)
 
 # add_executable(bladAngleDetection src/bladAngleDetection.cpp)
 
@@ -46,7 +47,7 @@ target_link_libraries(readPointCloud ${PCL_LIBRARIES})
 target_link_libraries(planeFitting ${PCL_LIBRARIES})
 target_link_libraries(main ${PCL_LIBRARIES})
 target_link_libraries(writeCsv ${PCL_LIBRARIES})
-
+target_link_libraries(scratchScript ${PCL_LIBRARIES})
 # target_link_libraries(bladAngleDetection ${PCL_LIBRARIES})
 
 # Print the current directory variable
