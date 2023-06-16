@@ -357,13 +357,28 @@ int main(int argc, char **argv)
     {
         Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
         /*
-        un comment the next line of code for to print the measured offest values on the termianl 
+        un comment the next line of code for to print the measured offest values on the termianl
         */
         // std::cout << "Dot product of between refrence blade and blade No.: "
         //           << pointCounter << " is equal = "
         //           << deltaVector.dot(normalizedVector) << std::endl;
         pointCounter++;
         writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
+    }
+
+    pointCounter = 0;
+    for (int i{0}; i < (bladeCoeff.size()); i += 3)
+    {
+
+        Eigen::Vector3d vFrame(bladeCoeff[i], bladeCoeff[i + 1], bladeCoeff[i + 2]);
+        Eigen::Matrix3d rotMatrix;
+        rotMatrix.col(2) = vFrame.normalized();
+        rotMatrix.col(0) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
+        rotMatrix.col(1) = rotMatrix.col(2).cross(rotMatrix.col(0));
+        Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(2, 0, 2);
+        std::cout << "The Roll,Pitch,Yaw Angles blade No. ->" << pointCounter << std::endl
+                  << euler_angles.transpose() << std::endl;
+        pointCounter++;
     }
     // std::cout << "The Normalized vector " << normalizedVector << endl ;
 

@@ -19,6 +19,7 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/search/impl/search.hpp>
 #include <pcl/features/normal_3d_omp.h>
+#include <unsupported/Eigen/EulerAngles>
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/filters/conditional_removal.h>
 #include <pcl/segmentation/region_growing.h>
