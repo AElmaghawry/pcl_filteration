@@ -291,7 +291,7 @@ int main(int argc, char **argv)
         bladeCoeff.push_back(coefficients->values[0]);
         bladeCoeff.push_back(coefficients->values[1]);
         bladeCoeff.push_back(coefficients->values[2]);
-        bladeCoeff.push_back(coefficients->values[3]);
+        // bladeCoeff.push_back(coefficients->values[3]);
 
         pcl::ModelCoefficients::Ptr coefficientsRef(new pcl::ModelCoefficients);
         coefficientsRef->values.push_back(0.0);
@@ -367,6 +367,8 @@ int main(int argc, char **argv)
     }
 
     pointCounter = 0;
+
+
     for (int i{0}; i < (bladeCoeff.size()); i += 3)
     {
 
@@ -376,6 +378,8 @@ int main(int argc, char **argv)
         rotMatrix.col(0) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
         rotMatrix.col(1) = rotMatrix.col(2).cross(rotMatrix.col(0));
         Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(2, 0, 2);
+        std::cout <<"The Rotation Matrix is of blade No. "<< pointCounter <<std::endl << rotMatrix << std::endl ;
+        std::cout<<"---------------------------------------"<<std::endl;
         std::cout << "The Roll,Pitch,Yaw Angles blade No. ->" << pointCounter << std::endl
                   << euler_angles.transpose() << std::endl;
         pointCounter++;
