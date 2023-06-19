@@ -381,9 +381,9 @@ int main(int argc, char **argv)
         Eigen::Vector3d vFrame(bladeCoeff[i], bladeCoeff[i + 1], bladeCoeff[i + 2]);
         Eigen::Matrix3d rotMatrix;
         rotMatrix.col(2) = vFrame.normalized();
-        rotMatrix.col(0) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
-        rotMatrix.col(1) = rotMatrix.col(2).cross(rotMatrix.col(0));
-        Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(2, 0, 2);
+        rotMatrix.col(1) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
+        rotMatrix.col(0) = rotMatrix.col(2).cross(rotMatrix.col(1));
+        Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(0, 1,2);
         std::cout << BOLDRED << "The Rotation Matrix is of blade No. " << pointCounter << RESET << std::endl
                   << rotMatrix << std::endl;
         std::cout << WHITE << "---------------------------------------" << std::endl;
@@ -392,10 +392,30 @@ int main(int argc, char **argv)
 
         std::vector<double> stdVector(euler_angles.data(), euler_angles.data() + euler_angles.size());
 
+        stdVector[0]= stdVector[0] * 180 / M_PI;
+        stdVector[1]= stdVector[1] * 180 / M_PI;
+        stdVector[2]= stdVector[2] * 180 / M_PI;
+
+        for (int i{0}; i < stdVector.size()-1; i++)
+        {
+            if (stdVector[i] > 90 && stdVector[i] < 180)
+            {
+                stdVector[i] = stdVector[i]-180 ; 
+            }
+            else if (stdVector[i] < -90 &&  stdVector[i] > -180 )
+            {
+                stdVector[i] = stdVector[i]+ 180;
+            }
+            else 
+            {
+                stdVector[i] = stdVector[i]; 
+            }
+        
+        }
+
         roll = stdVector[0];
         pitch = stdVector[1];
         yaw = stdVector[2];
-
         /*
         This is to print Roll,Pitch, and Yaw Angles
         */
