@@ -367,7 +367,13 @@ int main(int argc, char **argv)
     }
 
     pointCounter = 0;
+    std::string rotationAnglesCsv = "../data/rotAngles.csv";
+    CSVWriter rotationAngles(rotationAnglesCsv);
+    rotationAngles.writeRow({"Roll","Pitch","Yaw"});
 
+    double roll{0.0};
+    double pitch{0.0};
+    double yaw{0.0};
 
     for (int i{0}; i < (bladeCoeff.size()); i += 3)
     {
@@ -378,12 +384,32 @@ int main(int argc, char **argv)
         rotMatrix.col(0) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
         rotMatrix.col(1) = rotMatrix.col(2).cross(rotMatrix.col(0));
         Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(2, 0, 2);
-        std::cout <<"The Rotation Matrix is of blade No. "<< pointCounter <<std::endl << rotMatrix << std::endl ;
-        std::cout<<"---------------------------------------"<<std::endl;
-        std::cout << "The Roll,Pitch,Yaw Angles blade No. ->" << pointCounter << std::endl
-                  << euler_angles.transpose() << std::endl;
+        std::cout << BOLDRED << "The Rotation Matrix is of blade No. " << pointCounter << RESET << std::endl
+                  << rotMatrix << std::endl;
+        std::cout << WHITE << "---------------------------------------" << std::endl;
+        // std::cout << "The Roll,Pitch,Yaw Angles blade No. ->" << pointCounter << std::endl
+        //           << euler_angles.transpose() << std::endl;
+
+        std::vector<double> stdVector(euler_angles.data(), euler_angles.data() + euler_angles.size());
+
+        roll = stdVector[0];
+        pitch = stdVector[1];
+        yaw = stdVector[2];
+
+        /*
+        This is to print Roll,Pitch, and Yaw Angles
+        */
+        std::cout << YELLOW << "The Measured Angles " << std::endl;
+        std::cout << WHITE << "Roll Angle = " << CYAN << roll << std::endl;
+        std::cout << WHITE << "Pitch Angle = " << CYAN << pitch << std::endl;
+        std::cout << WHITE << "Yaw Angle = " << CYAN << yaw << std::endl;
+        std::cout << WHITE << "------------------------------------" << std::endl;
+
+        rotationAngles.writeRow({std::to_string(roll), std::to_string(pitch), std::to_string(yaw)});
+
         pointCounter++;
     }
+
     // std::cout << "The Normalized vector " << normalizedVector << endl ;
 
     // std::cout << bladeCoeff[0]<<bladeCoeff[1]<<bladeCoeff[2] << std::endl ;
