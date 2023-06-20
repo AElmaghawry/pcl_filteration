@@ -42,6 +42,85 @@ public:
     }
 };
 
+class EigenOperations {
+public:
+    void calculateOffsetsAndAngles(const std::vector<double>& bladeCoeff, const std::vector<double>& centriodBlades) {
+        Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
+        normalizedVector = normalizedVector.normalized();
+
+        std::vector<double> delta{};
+
+        for (int itr{3}; itr < centriodBlades.size(); itr += 3) {
+            delta.push_back(centriodBlades[itr] - centriodBlades[0]);
+            delta.push_back(centriodBlades[itr + 1] - centriodBlades[1]);
+            delta.push_back(centriodBlades[itr + 2] - centriodBlades[2]);
+        }
+
+        int pointCounter{0};
+        std::string offsetMeasurementsFile = "../data/offsetCalc.csv";
+        CSVWriter writerOffsetCalc(offsetMeasurementsFile);
+
+        writerOffsetCalc.writeRow({"Offset Calculation"});
+        for (int itr{0}; itr < delta.size(); itr += 3) {
+            Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
+            pointCounter++;
+            writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
+        }
+
+        pointCounter = 0;
+        
+        std::string rotationAnglesCsv = "../data/rotAngles.csv";
+        CSVWriter rotationAngles(rotationAnglesCsv);
+        rotationAngles.writeRow({"Roll", "Pitch", "Yaw"});
+
+        double roll{0.0};
+        double pitch{0.0};
+        double yaw{0.0};
+
+        for (int i{0}; i < bladeCoeff.size(); i += 3) {
+            Eigen::Vector3d vFrame(bladeCoeff[i], bladeCoeff[i + 1], bladeCoeff[i + 2]);
+            Eigen::Matrix3d rotMatrix;
+            rotMatrix.col(2) = vFrame.normalized();
+            rotMatrix.col(1) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
+            rotMatrix.col(0) = rotMatrix.col(2).cross(rotMatrix.col(1));
+            Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(0, 1, 2);
+            std::cout << "\033[1;31mThe Rotation Matrix is of blade No. " << pointCounter << "\033[0m" << std::endl
+                      << rotMatrix << std::endl;
+            std::cout << "\033[1;37m---------------------------------------\033[0m" << std::endl;
+
+            std::vector<double> stdVector(euler_angles.data(), euler_angles.data() + euler_angles.size());
+
+            stdVector[0] = stdVector[0] * 180 / M_PI;
+            stdVector[1] = stdVector[1] * 180 / M_PI;
+            stdVector[2] = stdVector[2] * 180 / M_PI;
+
+            for (int i{0}; i < stdVector.size() - 1; i++) {
+                if (stdVector[i] > 90 && stdVector[i] < 180) {
+                    stdVector[i] = stdVector[i] - 180;
+                } else if (stdVector[i] < -90 && stdVector[i] > -180) {
+                    stdVector[i] = stdVector[i] + 180;
+                } else {
+                    stdVector[i] = stdVector[i];
+                }
+            }
+
+            roll = stdVector[0];
+            pitch = stdVector[1];
+            yaw = stdVector[2];
+
+            std::cout << "\033[1;33mThe Measured Angles \033[0m" << std::endl;
+            std::cout << "\033[1;37mRoll Angle = \033[1;36m" << roll << std::endl;
+            std::cout << "\033[1;37mPitch Angle = \033[1;36m" << pitch << std::endl;
+            std::cout << "\033[1;37mYaw Angle = \033[1;36m" << yaw << std::endl;
+            std::cout << "\033[1;37m------------------------------------\033[0m" << std::endl;
+
+            rotationAngles.writeRow({std::to_string(roll), std::to_string(pitch), std::to_string(yaw)});
+
+            pointCounter++;
+        }
+    }
+};
+
 class PointCloudProcessing
 {
 public:
@@ -206,7 +285,6 @@ int main(int argc, char **argv)
         // std::cout << clusters.size() << std::endl;
 
         std::string cloud_of_intreset_dir = "../data/cloud_cluster_"; /// home/jeo/ku/pcl_filteration/data/cloud_cluster_0.pcd
-
         std::vector<std::string> files_paths{};
         PointCloudProcessing pcSelection;
 
@@ -336,99 +414,108 @@ int main(int argc, char **argv)
     // std::cout << "The Coff. for the recorded blades are equal = " << bladeCoeff.size() << std::endl;
 
     // Eigen::Vector3d v(0.00743252, -0.781734, 0.860328);
-    Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
-    normalizedVector = normalizedVector.normalized();
+    EigenOperations eigenOps;
 
-    std::vector<double> delta{};
+    eigenOps.calculateOffsetsAndAngles(bladeCoeff,centriodBlades);
+    
+    /*
+    
+    make it as class 
+    */
+    
+    // Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
+    // normalizedVector = normalizedVector.normalized();
 
-    for (int itr{3}; itr < (centriodBlades.size()); itr += 3)
-    {
-        delta.push_back(centriodBlades[itr] - centriodBlades[0]);
-        delta.push_back(centriodBlades[itr + 1] - centriodBlades[1]);
-        delta.push_back(centriodBlades[itr + 2] - centriodBlades[2]);
-    }
+    // std::vector<double> delta{};
 
-    int pointCounter{0};
-    std::string offsetMeasurmentsFile = "../data/offsetCalc.csv";
-    CSVWriter writerOffsetCalc(offsetMeasurmentsFile);
+    // for (int itr{3}; itr < (centriodBlades.size()); itr += 3)
+    // {
+    //     delta.push_back(centriodBlades[itr] - centriodBlades[0]);
+    //     delta.push_back(centriodBlades[itr + 1] - centriodBlades[1]);
+    //     delta.push_back(centriodBlades[itr + 2] - centriodBlades[2]);
+    // }
 
-    writerOffsetCalc.writeRow({"Offset Calculation"});
-    for (int itr{0}; itr < (delta.size()); itr += 3)
-    {
-        Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
-        /*
-        un comment the next line of code for to print the measured offest values on the termianl
-        */
-        // std::cout << "Dot product of between refrence blade and blade No.: "
-        //           << pointCounter << " is equal = "
-        //           << deltaVector.dot(normalizedVector) << std::endl;
-        pointCounter++;
-        writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
-    }
+    // int pointCounter{0};
+    // std::string offsetMeasurmentsFile = "../data/offsetCalc.csv";
+    // CSVWriter writerOffsetCalc(offsetMeasurmentsFile);
 
-    pointCounter = 0;
-    std::string rotationAnglesCsv = "../data/rotAngles.csv";
-    CSVWriter rotationAngles(rotationAnglesCsv);
-    rotationAngles.writeRow({"Roll","Pitch","Yaw"});
+    // writerOffsetCalc.writeRow({"Offset Calculation"});
+    // for (int itr{0}; itr < (delta.size()); itr += 3)
+    // {
+    //     Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
+    //     /*
+    //     un comment the next line of code for to print the measured offest values on the termianl
+    //     */
+    //     // std::cout << "Dot product of between refrence blade and blade No.: "
+    //     //           << pointCounter << " is equal = "
+    //     //           << deltaVector.dot(normalizedVector) << std::endl;
+    //     pointCounter++;
+    //     writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
+    // }
 
-    double roll{0.0};
-    double pitch{0.0};
-    double yaw{0.0};
+    // pointCounter = 0;
+    // std::string rotationAnglesCsv = "../data/rotAngles.csv";
+    // CSVWriter rotationAngles(rotationAnglesCsv);
+    // rotationAngles.writeRow({"Roll","Pitch","Yaw"});
 
-    for (int i{0}; i < (bladeCoeff.size()); i += 3)
-    {
+    // double roll{0.0};
+    // double pitch{0.0};
+    // double yaw{0.0};
 
-        Eigen::Vector3d vFrame(bladeCoeff[i], bladeCoeff[i + 1], bladeCoeff[i + 2]);
-        Eigen::Matrix3d rotMatrix;
-        rotMatrix.col(2) = vFrame.normalized();
-        rotMatrix.col(1) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
-        rotMatrix.col(0) = rotMatrix.col(2).cross(rotMatrix.col(1));
-        Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(0, 1,2);
-        std::cout << BOLDRED << "The Rotation Matrix is of blade No. " << pointCounter << RESET << std::endl
-                  << rotMatrix << std::endl;
-        std::cout << WHITE << "---------------------------------------" << std::endl;
-        // std::cout << "The Roll,Pitch,Yaw Angles blade No. ->" << pointCounter << std::endl
-        //           << euler_angles.transpose() << std::endl;
+    // for (int i{0}; i < (bladeCoeff.size()); i += 3)
+    // {
 
-        std::vector<double> stdVector(euler_angles.data(), euler_angles.data() + euler_angles.size());
+    //     Eigen::Vector3d vFrame(bladeCoeff[i], bladeCoeff[i + 1], bladeCoeff[i + 2]);
+    //     Eigen::Matrix3d rotMatrix;
+    //     rotMatrix.col(2) = vFrame.normalized();
+    //     rotMatrix.col(1) = Eigen::Vector3d::UnitX().cross(rotMatrix.col(2));
+    //     rotMatrix.col(0) = rotMatrix.col(2).cross(rotMatrix.col(1));
+    //     Eigen::Vector3d euler_angles = rotMatrix.eulerAngles(0, 1,2);
+    //     std::cout << BOLDRED << "The Rotation Matrix is of blade No. " << pointCounter << RESET << std::endl
+    //               << rotMatrix << std::endl;
+    //     std::cout << WHITE << "---------------------------------------" << std::endl;
+    //     // std::cout << "The Roll,Pitch,Yaw Angles blade No. ->" << pointCounter << std::endl
+    //     //           << euler_angles.transpose() << std::endl;
 
-        stdVector[0]= stdVector[0] * 180 / M_PI;
-        stdVector[1]= stdVector[1] * 180 / M_PI;
-        stdVector[2]= stdVector[2] * 180 / M_PI;
+    //     std::vector<double> stdVector(euler_angles.data(), euler_angles.data() + euler_angles.size());
 
-        for (int i{0}; i < stdVector.size()-1; i++)
-        {
-            if (stdVector[i] > 90 && stdVector[i] < 180)
-            {
-                stdVector[i] = stdVector[i]-180 ; 
-            }
-            else if (stdVector[i] < -90 &&  stdVector[i] > -180 )
-            {
-                stdVector[i] = stdVector[i]+ 180;
-            }
-            else 
-            {
-                stdVector[i] = stdVector[i]; 
-            }
+    //     stdVector[0]= stdVector[0] * 180 / M_PI;
+    //     stdVector[1]= stdVector[1] * 180 / M_PI;
+    //     stdVector[2]= stdVector[2] * 180 / M_PI;
+
+    //     for (int i{0}; i < stdVector.size()-1; i++)
+    //     {
+    //         if (stdVector[i] > 90 && stdVector[i] < 180)
+    //         {
+    //             stdVector[i] = stdVector[i]-180 ; 
+    //         }
+    //         else if (stdVector[i] < -90 &&  stdVector[i] > -180 )
+    //         {
+    //             stdVector[i] = stdVector[i]+ 180;
+    //         }
+    //         else 
+    //         {
+    //             stdVector[i] = stdVector[i]; 
+    //         }
         
-        }
+    //     }
 
-        roll = stdVector[0];
-        pitch = stdVector[1];
-        yaw = stdVector[2];
-        /*
-        This is to print Roll,Pitch, and Yaw Angles
-        */
-        std::cout << YELLOW << "The Measured Angles " << std::endl;
-        std::cout << WHITE << "Roll Angle = " << CYAN << roll << std::endl;
-        std::cout << WHITE << "Pitch Angle = " << CYAN << pitch << std::endl;
-        std::cout << WHITE << "Yaw Angle = " << CYAN << yaw << std::endl;
-        std::cout << WHITE << "------------------------------------" << std::endl;
+    //     roll = stdVector[0];
+    //     pitch = stdVector[1];
+    //     yaw = stdVector[2];
+    //     /*
+    //     This is to print Roll,Pitch, and Yaw Angles
+    //     */
+    //     std::cout << YELLOW << "The Measured Angles " << std::endl;
+    //     std::cout << WHITE << "Roll Angle = " << CYAN << roll << std::endl;
+    //     std::cout << WHITE << "Pitch Angle = " << CYAN << pitch << std::endl;
+    //     std::cout << WHITE << "Yaw Angle = " << CYAN << yaw << std::endl;
+    //     std::cout << WHITE << "------------------------------------" << std::endl;
 
-        rotationAngles.writeRow({std::to_string(roll), std::to_string(pitch), std::to_string(yaw)});
+    //     rotationAngles.writeRow({std::to_string(roll), std::to_string(pitch), std::to_string(yaw)});
 
-        pointCounter++;
-    }
+    //     pointCounter++;
+    // }
 
     // std::cout << "The Normalized vector " << normalizedVector << endl ;
 
