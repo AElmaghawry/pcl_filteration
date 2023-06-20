@@ -42,15 +42,19 @@ public:
     }
 };
 
-class EigenOperations {
+class EigenOperations
+{
+
 public:
-    void calculateOffsetsAndAngles(const std::vector<double>& bladeCoeff, const std::vector<double>& centriodBlades) {
+    void calculateOffsetsAndAngles(const std::vector<double> &bladeCoeff, const std::vector<double> &centriodBlades)
+    {
         Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
         normalizedVector = normalizedVector.normalized();
 
         std::vector<double> delta{};
 
-        for (int itr{3}; itr < centriodBlades.size(); itr += 3) {
+        for (int itr{3}; itr < centriodBlades.size(); itr += 3)
+        {
             delta.push_back(centriodBlades[itr] - centriodBlades[0]);
             delta.push_back(centriodBlades[itr + 1] - centriodBlades[1]);
             delta.push_back(centriodBlades[itr + 2] - centriodBlades[2]);
@@ -61,23 +65,25 @@ public:
         CSVWriter writerOffsetCalc(offsetMeasurementsFile);
 
         writerOffsetCalc.writeRow({"Offset Calculation"});
-        for (int itr{0}; itr < delta.size(); itr += 3) {
+        for (int itr{0}; itr < delta.size(); itr += 3)
+        {
             Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
             pointCounter++;
             writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
         }
 
         pointCounter = 0;
-        
+
         std::string rotationAnglesCsv = "../data/rotAngles.csv";
         CSVWriter rotationAngles(rotationAnglesCsv);
         rotationAngles.writeRow({"Roll", "Pitch", "Yaw"});
 
-        double roll{0.0};
-        double pitch{0.0};
-        double yaw{0.0};
+        // double roll{0.0};
+        // double pitch{0.0};
+        // double yaw{0.0};
 
-        for (int i{0}; i < bladeCoeff.size(); i += 3) {
+        for (int i{0}; i < bladeCoeff.size(); i += 3)
+        {
             Eigen::Vector3d vFrame(bladeCoeff[i], bladeCoeff[i + 1], bladeCoeff[i + 2]);
             Eigen::Matrix3d rotMatrix;
             rotMatrix.col(2) = vFrame.normalized();
@@ -94,12 +100,18 @@ public:
             stdVector[1] = stdVector[1] * 180 / M_PI;
             stdVector[2] = stdVector[2] * 180 / M_PI;
 
-            for (int i{0}; i < stdVector.size() - 1; i++) {
-                if (stdVector[i] > 90 && stdVector[i] < 180) {
+            for (int i{0}; i < stdVector.size() - 1; i++)
+            {
+                if (stdVector[i] > 90 && stdVector[i] < 180)
+                {
                     stdVector[i] = stdVector[i] - 180;
-                } else if (stdVector[i] < -90 && stdVector[i] > -180) {
+                }
+                else if (stdVector[i] < -90 && stdVector[i] > -180)
+                {
                     stdVector[i] = stdVector[i] + 180;
-                } else {
+                }
+                else
+                {
                     stdVector[i] = stdVector[i];
                 }
             }
@@ -119,6 +131,27 @@ public:
             pointCounter++;
         }
     }
+
+    double getRoll() const
+    {
+        return roll;
+    }
+
+    double getPitch() const
+    {
+        return pitch;
+    }
+
+    double getYaw() const
+    {
+        return yaw;
+    }
+
+private:
+    double roll{0.0};
+    double pitch{0.0};
+    double yaw{0.0};
+    int pointCounter{0};
 };
 
 class PointCloudProcessing
@@ -416,13 +449,18 @@ int main(int argc, char **argv)
     // Eigen::Vector3d v(0.00743252, -0.781734, 0.860328);
     EigenOperations eigenOps;
 
-    eigenOps.calculateOffsetsAndAngles(bladeCoeff,centriodBlades);
-    
+    eigenOps.calculateOffsetsAndAngles(bladeCoeff, centriodBlades);
+
+    double roll = eigenOps.getRoll();
+    double pitch = eigenOps.getPitch();
+    double yaw = eigenOps.getYaw();
+
+    std::cout << "Angles of the last Blade is equal " << roll << "," << pitch << ", " << yaw << std::endl;
     /*
-    
-    make it as class 
+
+    make it as class
     */
-    
+
     // Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
     // normalizedVector = normalizedVector.normalized();
 
@@ -487,17 +525,17 @@ int main(int argc, char **argv)
     //     {
     //         if (stdVector[i] > 90 && stdVector[i] < 180)
     //         {
-    //             stdVector[i] = stdVector[i]-180 ; 
+    //             stdVector[i] = stdVector[i]-180 ;
     //         }
     //         else if (stdVector[i] < -90 &&  stdVector[i] > -180 )
     //         {
     //             stdVector[i] = stdVector[i]+ 180;
     //         }
-    //         else 
+    //         else
     //         {
-    //             stdVector[i] = stdVector[i]; 
+    //             stdVector[i] = stdVector[i];
     //         }
-        
+
     //     }
 
     //     roll = stdVector[0];
