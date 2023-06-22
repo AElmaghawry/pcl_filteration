@@ -46,29 +46,68 @@ class EigenOperations
 {
 
 public:
-    void calculateOffsetsAndAngles(const std::vector<double> &bladeCoeff, const std::vector<double> &centriodBlades)
+    void calculateOffsetsAndAngles(const std::vector<double> &bladeCoeff, const std::vector<double> &centriodBlades,const std::vector<double> &bladeCoeffFull)
     {
         Eigen::Vector3d normalizedVector(bladeCoeff[0], bladeCoeff[1], bladeCoeff[2]);
         normalizedVector = normalizedVector.normalized();
 
         std::vector<double> delta{};
 
+
         for (int itr{3}; itr < centriodBlades.size(); itr += 3)
         {
-            delta.push_back(centriodBlades[itr] - centriodBlades[0]);
-            delta.push_back(centriodBlades[itr + 1] - centriodBlades[1]);
-            delta.push_back(centriodBlades[itr + 2] - centriodBlades[2]);
+            
+            double x = centriodBlades[itr] - centriodBlades[0];
+            double y = centriodBlades[itr + 1] - centriodBlades[1];
+            double z = centriodBlades[itr + 2] - centriodBlades[2];
+
+            delta.push_back(x);
+            delta.push_back(y);
+            delta.push_back(z);
+            std::cout << " The Z without correction " << z <<std::endl ; 
+
+            // correctedZ = -1 * ((a * x + b * y + d) / c);
+
+            // delta.push_back(correctedZ);
         }
 
-        int pointCounter{0};
-        std::string offsetMeasurementsFile = "../data/offsetCalc.csv";
+        std::vector<double> deltaCorrected{};
+        int vectorCounter {0}; 
+
+        for(int itr{4} ; itr < bladeCoeffFull.size(); itr +=4)
+        {
+            double a =  bladeCoeffFull[itr]; 
+            double b =  bladeCoeffFull[itr+1];
+            double c =  bladeCoeffFull[itr+2] ; 
+            double d = bladeCoeffFull[itr+3] ; 
+            double correctedZ {0.0}; 
+
+            correctedZ = -1 * ((a * delta[vectorCounter] + b * delta[vectorCounter+1] + d) / c);
+            std::cout<<"The corrected z is equal " << correctedZ <<std::endl ; 
+            deltaCorrected.push_back(correctedZ); 
+            vectorCounter +=1 ; 
+        }
+
+        std::cout << "The size of the corrected vecotor is equal to " << deltaCorrected.size() << std::endl ; 
+        std::cout << "The size of the corrected vecotor is equal to (delta) " << delta.size() << std::endl ; 
+
+        // int pointCounter{0};
+        // std::string offsetMeasurementsFile = "../data/offsetCalc.csv";
+        /*
+        corrected Z
+        */
+        std::string offsetMeasurementsFile = "../data/offsetCalcCorrected.csv";
+
         CSVWriter writerOffsetCalc(offsetMeasurementsFile);
 
         writerOffsetCalc.writeRow({"Offset Calculation"});
+        int j{0}; 
         for (int itr{0}; itr < delta.size(); itr += 3)
         {
-            Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], delta[itr + 2]);
-            pointCounter++;
+            //deltaCorrected[j]
+            Eigen::Vector3d deltaVector(delta[itr], delta[itr + 1], deltaCorrected[j]);
+            // pointCounter++;
+            j = j +1 ; 
             writerOffsetCalc.writeRow({std::to_string(deltaVector.dot(normalizedVector))});
         }
 
@@ -281,13 +320,16 @@ public:
 int main(int argc, char **argv)
 {
     std::vector<double> bladeCoeff{};
+    std::vector<double> bladeCoeffFull{};
+
     std::vector<double> centriodBlades{};
 
     std::string filename = "../data/measuredAngles.csv";
     CSVWriter writer(filename);
     writer.writeRow({"Blade No.", "Measured Angles"});
 
-    std::string direcoty_name = "../data/data_set/";
+    // std::string direcoty_name = "../data/data_set/";
+    std::string direcoty_name = "/home/jeo/ku/pcl_filteration/data/data_set/";
     // std::string file_name = "../data/data_set/4/4.pcd";
 
     std::cout << "\033[93m"
@@ -404,6 +446,12 @@ int main(int argc, char **argv)
         bladeCoeff.push_back(coefficients->values[2]);
         // bladeCoeff.push_back(coefficients->values[3]);
 
+        //this for the new z calcuation 
+        bladeCoeffFull.push_back(coefficients->values[0]);
+        bladeCoeffFull.push_back(coefficients->values[1]);
+        bladeCoeffFull.push_back(coefficients->values[2]);
+        bladeCoeffFull.push_back(coefficients->values[3]);
+
         pcl::ModelCoefficients::Ptr coefficientsRef(new pcl::ModelCoefficients);
         coefficientsRef->values.push_back(0.0);
         coefficientsRef->values.push_back(0.0);
@@ -449,7 +497,7 @@ int main(int argc, char **argv)
     // Eigen::Vector3d v(0.00743252, -0.781734, 0.860328);
     EigenOperations eigenOps;
 
-    eigenOps.calculateOffsetsAndAngles(bladeCoeff, centriodBlades);
+    eigenOps.calculateOffsetsAndAngles(bladeCoeff, centriodBlades,bladeCoeffFull);
 
     double roll = eigenOps.getRoll();
     double pitch = eigenOps.getPitch();

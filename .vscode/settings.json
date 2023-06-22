@@ -63,6 +63,10 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "bit": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "unordered_set": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "shared_mutex": "cpp"
     }
 }
